@@ -1,0 +1,58 @@
+﻿//1.Tổng doanh số theo Năm và Nhóm Sản phẩm
+SELECT NONEMPTY([Dim Product].[Category].[Category]) ON ROWS,
+NONEMPTY([Dim Time].[Year].[Year]) ON COLUMNS
+FROM [Star Gr2 View]
+WHERE [Measures].[Total Price];
+
+//2. Tổng doanh số theo Khu vực và Loại Khách hàng
+SELECT NONEMPTY([Dim Customer].[Customer Type].[Customer Type]) ON COLUMNS,
+NONEMPTY([Dim Region].[Region].[Region]) ON ROWS
+FROM [Star Gr2 View]
+WHERE [Measures].[Total Price];
+
+//3. Mức giảm giá trung bình theo danh mục sản phẩm
+WITH MEMBER [Measures].[Avg Discount] AS  
+			AVG([Dim Product].[Product].MEMBERS, [Measures].[Discount])  
+SELECT 
+    nonempty([Measures].[Avg Discount]) ON COLUMNS,  
+    nonempty([Dim Product].[Category].MEMBERS) ON ROWS  
+FROM [Star Gr2 View];
+
+//4. Sắp xếp danh mục sản phẩm theo tổng giá trị đơn hàng (giảm dần)
+SELECT	{[Measures].[Total Price]} ON COLUMNS,
+		NONEMPTY(ORDER({[Dim Product].[Category].MEMBERS}, 
+						[Measures].[Total Price], 
+						DESC), 
+						[Measures].[Total Price]
+		) ON ROWS
+FROM [Star Gr2 View]
+
+//5.  Top 5 danh mục sản phẩm có tổng giá trị đơn hàng (Total Price) cao nhất
+SELECT {[Measures].[Total Price]} ON COLUMNS,
+		TOPCOUNT(
+        NONEMPTY({[Dim Product].[Category].MEMBERS}, [Measures].[Total Price]), 
+        5, 
+        [Measures].[Total Price]
+		) ON ROWS
+FROM [Star Gr2 View]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
